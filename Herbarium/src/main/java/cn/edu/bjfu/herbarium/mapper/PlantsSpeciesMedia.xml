@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsSpeciesMediaDao">
+	<insert id="post" parameterType="PlantsSpeciesMedia">
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="media_id">  
+       		SELECT P_SPECIES_MEDIA_SEQ.nextval as media_id from DUAL  
+   		</selectKey>  
+		insert into P_SPECIES_MULTI_MEDIA (media_id,species_id,media_path,media_compress_path,media_compress_big_path,media_type_id,media_discribe,photographer,shooting_time,shooting_area,shooting_part,identifiers)
+		values (#{media_id},#{species_id},#{media_path},#{media_compress_path},#{media_compress_big_path},#{media_type_id},#{media_discribe},#{photographer},#{shooting_time},#{shooting_area},#{shooting_part},#{identifiers})
+	</insert>
+	
+	<update id="put" parameterType="PlantsSpeciesMedia">
+		update P_SPECIES_MULTI_MEDIA set photographer=#{photographer},shooting_time=#{shooting_time},identifiers=#{identifiers},shooting_area=#{shooting_area}
+										 ,shooting_part=#{shooting_part} where media_id = #{media_id}
+	</update>
+	<delete id="delete" parameterType="Long">
+		delete P_SPECIES_MULTI_MEDIA where media_id = #{media_id}
+	</delete>
+	
+	<select id="get" resultType="PlantsSpeciesMedia">
+		select * from P_SPECIES_MULTI_MEDIA c where 1=1 
+				<if test="media_id != null">  
+					AND c.media_id = ${media_id}
+				</if>
+				<if test="species_id != null">  
+					AND c.species_id = ${species_id}
+				</if>
+        order by media_id desc
+	</select>
+	
+	<select id="getAll" resultType="PlantsSpeciesMedia">
+		SELECT * FROM P_SPECIES_MULTI_MEDIA
+	</select>
+	
+	<select id="getPage" resultType="PlantsSpeciesMedia">
+		select * from ( 
+           select t.*, rownum r from 
+             (select * from P_SPECIES_MULTI_MEDIA b where 1=1
+				<if test="species_id != null">
+				    AND b.species_id = ${species_id}
+				</if>
+      <![CDATA[ order by b.media_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+    	  select count(*) from  P_SPECIES_MULTI_MEDIA b where 1=1
+		<if test="species_id != null">
+		    AND b.species_id = ${species_id}
+		</if>
+	</select>
+</mapper>

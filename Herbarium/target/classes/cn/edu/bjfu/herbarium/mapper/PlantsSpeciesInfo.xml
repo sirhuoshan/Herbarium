@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsSpeciesInfoDao">
+	<resultMap type="PlantsSpeciesInfo" id="PlantsSpeciesInfoMap">
+		<id property="species_id" column="species_id"/>
+		<result property="latin_name" column="latin_name"/>
+		<result property="chinese_name" column="chinese_name"/>
+		<result property="other_name" column="other_name"/>
+		<result property="character" column="character"/>
+		<result property="location" column="location"/>
+		<result property="fruit_period" column="fruit_period"/>
+		<result property="use" column="use"/>
+		<result property="growth" column="growth"/>
+		<result property="protect_id" column="protect_id"/>
+		<result property="iucn_id" column="iucn_id"/>
+		<result property="cites_id" column="cites_id"/>
+		<result property="redbook_id" column="redbook_id"/>
+		<result property="genus" column="genus"/>
+		<association property="family" column="genus" select="getFamily"></association>
+		<association property="genus_val" column="genus" select="getGenus"></association>
+	</resultMap>
+	
+	<select id="getFamily" resultType="java.lang.String">
+		select class_name || ' ' || class_latin as family from P_SPECIMEN_CLASS_TABLE where class_id in (select parent_id from P_SPECIMEN_CLASS_TABLE where class_id = #{genus})
+	</select>
+	
+	<select id="getGenus" resultType="java.lang.String">
+		select class_name || ' ' || class_latin as genus from P_SPECIMEN_CLASS_TABLE where class_id  = #{genus}
+	</select>
+
+	<insert id="post" parameterType="PlantsSpeciesInfo">
+		insert into P_SPECIES_INFO (species_id,latin_name,chinese_name,other_name,character,location,fruit_period,use,growth,genus,protect_id,iucn_id,cites_id,redbook_id)
+		values (P_SPECIES_SEQ.nextval,#{latin_name},#{chinese_name},#{other_name},#{character},#{location},#{fruit_period},#{use},#{growth},#{genus},#{protect_id},#{iucn_id},#{cites_id},#{redbook_id})
+	</insert>
+	
+	<update id="put" parameterType="PlantsSpeciesInfo">
+		update P_SPECIES_INFO set latin_name=#{latin_name},chinese_name=#{chinese_name},other_name=#{other_name},character=#{character},location=#{location},fruit_period=#{fruit_period},
+							use=#{use},growth=#{growth},genus=#{genus},protect_id=#{protect_id},iucn_id=#{iucn_id},cites_id=#{cites_id},redbook_id=#{redbook_id} where species_id = #{species_id}
+	</update>
+	<delete id="delete" parameterType="Long">
+		delete P_SPECIES_INFO where species_id = #{species_id}
+	</delete>
+	
+	<select id="getPage" resultMap="PlantsSpeciesInfoMap">
+		select * from ( 
+           select t.*, rownum r from 
+             (select * from P_SPECIES_INFO c where 1=1 
+             	<if test="species_id != null">  
+					AND c.species_id = ${species_id}
+				</if>
+				<if test="latin_name != null">  
+					AND c.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND c.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="family != null">
+					AND genus in (select class_id from P_SPECIMEN_CLASS_TABLE where parent_id in
+								 (select class_id from P_SPECIMEN_CLASS_TABLE where class_latin like '%'|| '${family}' || '%' or class_name like '%'|| '${family}' || '%'  group by class_id))
+				</if>
+				<if test="genus != null">
+				    AND genus in (select class_id from P_SPECIMEN_CLASS_TABLE where class_latin like '%'|| '${genus}' || '%' or class_name like '%'|| '${genus}' || '%')
+				</if>
+      <![CDATA[ order by species_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="get" resultMap="PlantsSpeciesInfoMap">
+		select * from P_SPECIES_INFO c where 1=1 
+				<if test="species_id != null">  
+					AND c.species_id = ${species_id}
+				</if>
+				<if test="latin_name != null">  
+					AND c.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND c.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="genus != null">
+				    AND genus =${genus}
+				</if>
+        order by species_id desc
+	</select>
+	
+	<select id="getAll" resultType="PlantsSpeciesInfo">
+		SELECT * FROM P_SPECIES_INFO
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+        select count(*) from P_SPECIES_INFO c where 1=1
+		<if test="species_id != null">  
+			AND c.species_id = ${species_id}
+		</if>
+		<if test="latin_name != null">  
+			AND c.latin_name like '%' || '${latin_name}'|| '%'
+		</if>
+		<if test="chinese_name != null">  
+			AND c.chinese_name like '%' || '${chinese_name}'|| '%' 
+		</if>
+		<if test="family != null">
+			AND genus in (select class_id from P_SPECIMEN_CLASS_TABLE where parent_id in
+								 (select class_id from P_SPECIMEN_CLASS_TABLE where class_latin like '%'|| '${family}' || '%' or class_name like '%'|| '${family}' || '%'  group by class_id))
+		</if>
+		<if test="genus != null">
+		    AND genus in (select class_id from P_SPECIMEN_CLASS_TABLE where class_latin like '%'|| '${genus}' || '%' or class_name like '%'|| '${genus}' || '%')
+		</if>
+	</select>
+	<select id="getAutoData" resultType ="PlantsSpeciesInfo">
+		select c.*, d.class_name  || ' ' || d.class_latin as genus_val, e.class_name  || ' ' || e.class_latin as family from 
+		P_SPECIES_INFO c ,P_SPECIMEN_CLASS_TABLE d,P_SPECIMEN_CLASS_TABLE e where c.genus = d.class_id and d.parent_id = e.class_id
+				<if test="latin_name != null">  
+					AND c.latin_name like '${latin_name}'|| '%'
+				</if>
+        order by species_id desc
+	</select>
+</mapper>

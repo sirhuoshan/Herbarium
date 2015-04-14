@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsCollectDao">
+	<resultMap type="PlantsCollect" id="PlantsCollectMap">
+		<id property="specimen_id" column="specimen_id"/>
+		<result property="species_id" column="species_id"/>
+		<result property="chinese_name" column="chinese_name"/>
+		<result property="latin_name" column="latin_name"/>
+		<result property="collect_id" column="collect_id"/>
+		<result property="collecter" column="collecter"/>
+		<result property="collect_date" column="collect_date"/>
+		<result property="country" column="country"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="district" column="district"/>
+		<result property="county" column="county"/>
+		<result property="town" column="town"/>
+		<result property="detail_area" column="detail_area"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="elevation" column="elevation"/>
+		<result property="live_environment" column="live_environment"/>
+		<result property="live_type_id" column="live_type_id"/>
+		<result property="trivial_name" column="trivial_name"/>
+		<result property="intenational_codes" column="intenational_codes"/>
+		<result property="height" column="height"/>
+		<result property="bark" column="bark"/>
+		<result property="branch" column="branch"/>
+		<result property="leaf" column="leaf"/>
+		<result property="flower" column="flower"/>
+		<result property="fruit" column="fruit"/>
+		<result property="dbh" column="dbh"/>
+		<result property="resource_state" column="resource_state"/>
+		<result property="isidentified" column="isidentified"/>
+		<result property="collect_remark" column="collect_remark"/>
+		<result property="barcode_id" column="barcode_id"/>
+		<result property="family" column="family" />
+		<result  property="genus" column="genus" />
+	</resultMap>
+
+	<insert id="post" parameterType="PlantsCollect">
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="specimen_id">  
+       		SELECT PLANT_COLLECT_SEQ.nextval as specimen_id from DUAL  
+   		</selectKey>  
+   		insert into p_collect_info (specimen_id,species_id,chinese_name,latin_name,collect_id,collecter,collect_date,country,province,city,district,
+   									county,town,detail_area,longitude,latitude,elevation,live_environment,live_type_id,trivial_name,intenational_codes,
+   									height,bark,branch,leaf,flower,fruit,dbh,resource_state,isidentified,collect_remark) values 
+   									(#{specimen_id},#{species_id},#{chinese_name},#{latin_name},#{collect_id},#{collecter},#{collect_date},#{country},#{province},#{city},#{district},
+   									#{county},#{town},#{detail_area},#{longitude},#{latitude},#{elevation},#{live_environment},#{live_type_id},#{trivial_name},#{intenational_codes},
+   									#{height},#{bark},#{branch},#{leaf},#{flower},#{fruit},#{dbh},#{resource_state},#{isidentified},#{collect_remark})
+	</insert>
+	
+	<update id="put" parameterType="PlantsCollect">
+		update p_collect_info set species_id=#{species_id},chinese_name=#{chinese_name},latin_name=#{latin_name},collect_id=#{collect_id},
+								  collecter=#{collecter},collect_date=#{collect_date},country=#{country},province=#{province},city=#{city},district=#{district},
+   								  county=#{county},town=#{town},detail_area=#{detail_area},longitude=#{longitude},latitude=#{latitude},elevation=#{elevation},
+   								  live_environment=#{live_environment},live_type_id=#{live_type_id},trivial_name=#{trivial_name},intenational_codes=#{intenational_codes},
+   								  height=#{height},bark=#{bark},branch=#{branch},leaf=#{leaf},flower=#{flower},fruit=#{fruit},dbh=#{dbh},resource_state=#{resource_state},
+   								  isidentified=#{isidentified},collect_remark=#{collect_remark} where specimen_id = #{specimen_id} 
+	</update>
+	<delete id="delete" parameterType="Long">
+		delete P_SPECIES_INFO where species_id = #{species_id}
+	</delete>
+	
+	<select id="getPage" resultType="PlantsCollect">
+		select * from ( 
+           select t.*, rownum r from 
+             (select a.*,b.barcode_id,d.class_name || ' ' || d.class_latin as genus,e.class_name || ' ' || e.class_latin as family from  
+              p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+              where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+				<if test="latin_name != null">  
+					AND a.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="family != null">
+					AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+				</if>
+				<if test="genus != null">
+				    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+				</if>
+				<if test="barcode_id != null">
+				    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+				</if>
+      <![CDATA[ order by a.specimen_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="get" resultMap="PlantsCollectMap">
+		select a.*,b.barcode_id,d.class_name || ' ' || d.class_latin as genus,e.class_name || ' ' || e.class_latin as family from  
+              p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+              where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+              	<if test="specimen_id != null">  
+					AND a.specimen_id = ${specimen_id}
+				</if>
+				<if test="latin_name != null">  
+					AND a.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="family != null">
+					AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+				</if>
+				<if test="genus != null">
+				    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+				</if>
+				<if test="barcode_id != null">
+				    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+				</if>
+      	order by a.specimen_id desc 
+	</select>
+	
+	<select id="getAll" resultType="PlantsSpeciesInfo">
+		SELECT * FROM P_SPECIES_INFO
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+    	  select count(*) from  
+          p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+          where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+		<if test="latin_name != null">  
+			AND a.latin_name like '%' || '${latin_name}'|| '%'
+		</if>
+		<if test="chinese_name != null">  
+			AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+		</if>
+		<if test="family != null">
+			AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+		</if>
+		<if test="genus != null">
+		    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+		</if>
+		<if test="barcode_id != null">
+		    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+		</if>
+	</select>
+	
+</mapper>

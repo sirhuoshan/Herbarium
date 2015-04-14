@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsIdentifyDao">
+	<insert id="post" parameterType="PlantsIdentify">
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="identify_id">  
+       		SELECT PLANT_IDENTIFY_SEQ.nextval as identify_id from DUAL  
+   		</selectKey>  
+		insert into p_identify_info_table (identify_id,specimen_id,identifier_id,scientific_name,chinese_name,famaly_name,identify_info,identify_date,identify_remark) 
+								   values (#{identify_id},#{specimen_id},#{identifier_id},#{scientific_name},#{chinese_name},#{famaly_name},#{identify_info},#{identify_date},#{identify_remark})
+	</insert>
+	
+	<update id="put" parameterType="PlantsIdentify">
+		update p_identify_info_table set identifier_id = ${identifier_id},scientific_name = ${scientific_name},chinese_name = ${chinese_name},famaly_name = ${famaly_name},
+										 identify_info = ${identify_info},identify_date = ${identify_date},identify_remark = ${identify_remark}
+										where  identify_id = ${identify_id}
+	</update>
+	<delete id="delete" parameterType="Long">
+		delete p_identify_info_table where identify_id = #{identify_id}
+	</delete>
+	
+	<select id="getPage" resultType="PlantsIdentify">
+		select * from ( 
+           select t.*, rownum r from 
+             (select a.*,b.barcode_id,d.class_name || ' ' || d.class_latin as genus,e.class_name || ' ' || e.class_latin as family from  
+              p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+              where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+				<if test="latin_name != null">  
+					AND a.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="family != null">
+					AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+				</if>
+				<if test="genus != null">
+				    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+				</if>
+				<if test="barcode_id != null">
+				    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+				</if>
+      <![CDATA[ order by a.specimen_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="get" resultType="PlantsIdentify">
+		select * from p_identify_info_table where 1 = 1  
+              	<if test="specimen_id != null">  
+					AND specimen_id = ${specimen_id}
+				</if>
+				<if test="identify_id != null">  
+					AND identify_id = ${identify_id}
+				</if>
+      	order by identify_id desc 
+	</select>
+	
+	<select id="getAll" resultType="PlantsIdentify">
+		SELECT * FROM P_SPECIES_INFO
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+    	  select count(*) from  
+          p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+          where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+		<if test="latin_name != null">  
+			AND a.latin_name like '%' || '${latin_name}'|| '%'
+		</if>
+		<if test="chinese_name != null">  
+			AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+		</if>
+		<if test="family != null">
+			AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+		</if>
+		<if test="genus != null">
+		    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+		</if>
+		<if test="barcode_id != null">
+		    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+		</if>
+	</select>
+	
+</mapper>

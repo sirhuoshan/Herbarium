@@ -1,0 +1,5 @@
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix{display:inline-table;margin:10px 0 0 0;}
+.section ul li{float:left;margin-right:14px;margin-bottom:13px;display:inline;width:320px;height:200px;overflow:hidden;position:relative;}
+.section ul li .photo{width:150px;height:100px;max-width:150px;max-height:100px;overflow:hidden;text-align:center;background: #e2e9ef;vertical-align:middle; display: table-cell;}
+.section .rsp{width:320px;height:180px;overflow:hidden;position: absolute;top:0px;left:0px;}

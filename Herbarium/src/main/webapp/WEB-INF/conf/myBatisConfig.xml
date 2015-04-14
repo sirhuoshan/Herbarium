@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="false"/>
+	</settings>	
+	
+	<typeAliases>
+		<typeAlias alias="BacteriumCategory" type="cn.edu.bjfu.herbarium.domain.BacteriumCategory"/>
+		<typeAlias alias="CategoryJson" type="cn.edu.bjfu.herbarium.domain.CategoryJson"/>
+		<typeAlias alias="BacteriumInfo" type="cn.edu.bjfu.herbarium.domain.bacterium.BacteriumInfo"/>
+		<typeAlias alias="PlantsCategory" type="cn.edu.bjfu.herbarium.domain.PlantsCategory"/>
+		<typeAlias alias="PlantsSpeciesInfo" type="cn.edu.bjfu.herbarium.domain.PlantsSpeciesInfo"/>
+		<typeAlias alias="PlantsSpeciesMedia" type="cn.edu.bjfu.herbarium.domain.PlantsSpeciesMedia"/>
+		<typeAlias alias="PlantsSpeciesInfoShow" type="cn.edu.bjfu.herbarium.domain.PlantsSpeciesInfoShow"/>
+		<typeAlias alias="PlantsCollect" type="cn.edu.bjfu.herbarium.domain.PlantsCollect"/>
+		<typeAlias alias="PlantsStorage" type="cn.edu.bjfu.herbarium.domain.PlantsStorage"/>
+		<typeAlias alias="PlantsIdentify" type="cn.edu.bjfu.herbarium.domain.PlantsIdentify"/>
+		<typeAlias alias="PlantsMedia" type="cn.edu.bjfu.herbarium.domain.PlantsMedia"/>
+		<typeAlias alias="AutoJson" type="cn.edu.bjfu.herbarium.domain.AutoJson"/>
+		<typeAlias alias="Pagination" type="cn.edu.bjfu.herbarium.util.Pagination"/>
+	</typeAliases>
+	<!-- 配置插件 --> 
+   <!--  <plugins>  
+        配置拦截器插件  
+        <plugin interceptor="cn.edu.bjfu.herbarium.util.Interceptor.PageInterceptor">
+        	<property name="dialect" value="oracle"/>
+			<property name="databaseType" value="oracle"/>
+        </plugin>    
+    </plugins>     -->
+</configuration>

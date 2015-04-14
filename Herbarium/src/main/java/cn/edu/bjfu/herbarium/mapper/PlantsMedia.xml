@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsMediaDao">
+	<insert id="post" parameterType="PlantsMedia">
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="media_id">  
+       		SELECT PLANT_MULTI_SEQ.nextval as media_id from DUAL  
+   		</selectKey> 
+		insert into p_multi_media (media_id,specimen_id,media_path,media_type_id,media_discribe,media_compress_path) values
+								  (${media_id},#{specimen_id},#{media_path},#{media_type_id},#{media_discribe},#{media_compress_path})
+	</insert>
+	
+	<update id="put" parameterType="PlantsMedia">
+		update P_SPECIES_INFO set latin_name=#{latin_name},chinese_name=#{chinese_name},other_name=#{other_name},character=#{character},location=#{location},fruit_period=#{fruit_period},
+							use=#{use},growth=#{growth},genus=#{genus},protect_id=#{protect_id},iucn_id=#{iucn_id},cites_id=#{cites_id},redbook_id=#{redbook_id} where species_id = #{species_id}
+	</update>
+	<delete id="delete" parameterType="Long">
+		delete p_multi_media where media_id = #{media_id}
+	</delete>
+	
+	<select id="getPage" resultType="PlantsMedia">
+		select * from ( 
+           select t.*, rownum r from 
+             (select * from p_multi_media b where 1=1
+				<if test="specimen_id != null">
+				    AND b.specimen_id = ${specimen_id}
+				</if>
+      <![CDATA[ order by b.media_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="get" resultType="PlantsMedia">
+		select * from p_multi_media where 1=1 
+			<if test="specimen_id != null">
+			    AND specimen_id = ${specimen_id}
+			</if>
+			<if test="media_id != null">
+			    AND media_id = ${media_id}
+			</if>
+		order by specimen_id desc 
+	</select>
+	
+	<select id="getAll" resultType="PlantsMedia">
+		SELECT * FROM P_SPECIES_INFO
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+    	  select count(*) from  
+          p_collect_info a,p_storage_info_table b,p_species_info c,p_specimen_class_table d,p_specimen_class_table e 
+          where a.specimen_id = b.specimen_id(+) and a.species_id = c.species_id(+) and c.genus = d.class_id and d.parent_id = e.class_id
+		<if test="latin_name != null">  
+			AND a.latin_name like '%' || '${latin_name}'|| '%'
+		</if>
+		<if test="chinese_name != null">  
+			AND a.chinese_name like '%' || '${chinese_name}'|| '%' 
+		</if>
+		<if test="family != null">
+			AND e.class_latin || e.class_name like '%'|| '${family}' || '%'
+		</if>
+		<if test="genus != null">
+		    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+		</if>
+		<if test="barcode_id != null">
+		    AND b.barcode_id like '%'|| '${barcode_id}' || '%'
+		</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.PlantsUserDao">
+	<resultMap type="PlantsSpeciesInfo" id="PlantsSpeciesInfoMap">
+		<id property="species_id" column="species_id"/>
+		<result property="latin_name" column="latin_name"/>
+		<result property="chinese_name" column="chinese_name"/>
+		<result property="other_name" column="other_name"/>
+		<result property="character" column="character"/>
+		<result property="location" column="location"/>
+		<result property="fruit_period" column="fruit_period"/>
+		<result property="use" column="use"/>
+		<result property="growth" column="growth"/>
+		<result property="protect_id" column="protect_id"/>
+		<result property="iucn_id" column="iucn_id"/>
+		<result property="cites_id" column="cites_id"/>
+		<result property="redbook_id" column="redbook_id"/>
+		<result property="genus" column="genus"/>
+		<result property="family" column="family"/>
+		<result property="genus_val" column="genus_val"/>
+	</resultMap>
+
+
+	<select id="auto" resultType="AutoJson">
+		SELECT X.latin||Y.chinese as name 
+		FROM (select latin_name as latin,species_id as id from P_SPECIES_INFO where latin_name like '${q}'|| '%') X full outer join
+		 	 (select chinese_name as chinese,species_id as id from P_SPECIES_INFO where chinese_name like '${q}'|| '%') Y
+			  on X.latin = Y.chinese where <![CDATA[ rownum <= #{limit} ]]>
+	</select>	
+	
+	<select id="getPage" resultMap="PlantsSpeciesInfoMap">
+		select * from ( 
+           select t.*, rownum r from 
+             (select c.*,d.class_name || ' ' || d.class_latin as genus_val,e.class_name || ' ' || e.class_latin as family from P_SPECIES_INFO c ,p_specimen_class_table d,p_specimen_class_table e
+             	where c.genus = d.class_id(+) and d.parent_id = e.class_id 
+             	<if test="q != null">  
+					AND (c.latin_name like '%' || '${q}'|| '%' or  c.chinese_name like '%' || '${q}'|| '%' )
+				</if>
+             	<if test="species_id != null">  
+					AND c.species_id = ${species_id}
+				</if>
+				<if test="latin_name != null">  
+					AND c.latin_name like '%' || '${latin_name}'|| '%'
+				</if>
+				<if test="chinese_name != null">  
+					AND c.chinese_name like '%' || '${chinese_name}'|| '%' 
+				</if>
+				<if test="family != null">
+					AND d.class_latin || d.class_name like '%'|| '${family}' || '%'
+				</if>
+				<if test="genus != null">
+				    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+				</if>
+      <![CDATA[ order by species_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="getRelateSpecies" resultMap="PlantsSpeciesInfoMap">
+		select * from ( 
+           select t.*, rownum r from 
+             (select * from P_SPECIES_INFO c where 1=1
+             	<if test="species_id != null">  
+					AND c.species_id != ${species_id}
+				</if>
+				<if test="genus != null">
+				    AND c.genus = ${genus}
+				</if>
+      <![CDATA[ order by species_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+        select count(*) from P_SPECIES_INFO c ,p_specimen_class_table d,p_specimen_class_table e
+             	where c.genus = d.class_id(+) and d.parent_id = e.class_id  
+        <if test="q != null">  
+			AND (c.latin_name like '%' || '${q}'|| '%' or  c.chinese_name like '%' || '${q}'|| '%' )
+		</if>    	
+		<if test="species_id != null">  
+			AND c.species_id = ${species_id}
+		</if>
+		<if test="latin_name != null">  
+			AND c.latin_name like '%' || '${latin_name}'|| '%'
+		</if>
+		<if test="chinese_name != null">  
+			AND c.chinese_name like '%' || '${chinese_name}'|| '%' 
+		</if>
+		<if test="family != null">
+			AND d.class_latin || d.class_name like '%'|| '${family}' || '%'
+		</if>
+		<if test="genus != null">
+		    AND e.class_latin || e.class_name like '%'|| '${genus}' || '%' 
+		</if>
+	</select>
+	
+	
+	
+</mapper>

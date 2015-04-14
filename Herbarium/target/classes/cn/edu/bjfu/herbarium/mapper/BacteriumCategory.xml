@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bjfu.herbarium.dao.BacteriumCategoryDao">
+
+	<resultMap type="BacteriumCategory" id="BacteriumCategoryMap">
+		<id property="class_id" column="class_id"/>
+		<result property="parent_id" column="parent_id"/>
+		<result property="class_name" column="class_name"/>
+		<result property="class_latin" column="class_latin"/>
+		<result property="class_describe" column="class_describe"/>
+		<result property="class_level" column="class_level"/>
+		<result property="class_path" column="class_path"/>
+		<association property="children" column="class_id" select="getChildCategories" />  
+	</resultMap>
+	
+	<resultMap type="CategoryJson" id="CategoryJsonMap">
+		<id property="class_id" column="class_id"/>
+		<result property="class_latin" column="class_latin"/>
+		<result property="class_name" column="class_name"/> 
+		<association property="children" column="class_id" select="getChildCategoriesJson" />  
+	</resultMap>
+	
+	<insert id="post" parameterType="BacteriumCategory">
+		insert into B_SPECIMEN_CLASS_TABLE (class_id,class_name,class_latin,class_describe,class_path,parent_id)
+		values (BACTERIUM_CLASS_SEQ.nextval,#{class_name},#{class_latin},#{class_describe},#{class_path},#{parent_id})
+	</insert>
+	
+	<update id="put" parameterType="BacteriumCategory">
+		update B_SPECIMEN_CLASS_TABLE set class_name = #{class_name},class_latin = #{class_latin},class_describe = #{class_describe},
+										  class_path = #{class_path},parent_id = #{parent_id} where class_id = #{class_id}
+	</update>
+	
+	<delete id="delete" parameterType="Long">
+		delete B_SPECIMEN_CLASS_TABLE where class_id in (
+		select class_id from b_specimen_class_table connect by prior class_id=parent_id start with class_id = #{class_id})
+	</delete>
+	
+	<select id="getPage" resultMap="BacteriumCategoryMap">
+		select * from ( 
+           select t.*, rownum r from 
+             (select * from b_specimen_class_table c where 1=1 
+             	<if test="parent_id != null">  
+					AND c.parent_id = ${parent_id}
+				</if>
+				<if test="class_id != null">  
+					AND c.class_id = ${class_id}
+				</if>
+				<if test="class_name != null">  
+					AND c.class_name like '%' || '${class_name}'|| '%'
+				</if>
+				<if test="class_latin != null">  
+					AND c.class_latin like '%' || '${class_latin}'|| '%' 
+				</if>
+      <![CDATA[ order by class_id desc ) t where rownum <= #{start}+#{limit}) where r > #{start}]]>
+	</select>
+	
+	<select id="get" resultType="BacteriumCategory">
+		select * from b_specimen_class_table c where 1=1 
+				<if test="parent_id != null">  
+					AND c.parent_id = ${parent_id}
+				</if>
+				<if test="class_id != null">  
+					AND c.class_id = ${class_id}
+				</if>
+				<if test="class_name != null">  
+					AND c.class_name like '%' || '${class_name}'|| '%'
+				</if>
+				<if test="class_latin != null">  
+					AND c.class_latin like '%' || '${class_latin}'|| '%' 
+				</if>
+        order by class_id desc
+	</select>
+	
+	<select id="getAll" resultType="BacteriumCategory">
+		SELECT * FROM B_SPECIMEN_CLASS_TABLE
+	</select>
+	
+	<select id="getCategoryJson" resultMap="CategoryJsonMap">
+		SELECT * FROM A_SPECIMEN_CLASS_TABLE where class_id = 0
+	</select>
+	
+	<select id="getChildCategoriesJson" parameterType="int" resultMap="CategoryJsonMap">
+		SELECT  *  FROM A_SPECIMEN_CLASS_TABLE WHERE PARENT_ID = #{class_id}
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+        select count(*) from b_specimen_class_table c where 1=1
+		<if test="parent_id != null">  
+			AND c.parent_id = ${parent_id}
+		</if>
+		<if test="class_name != null">  
+			AND c.class_name like '%' || '${class_name}'|| '%'
+		</if>
+		<if test="class_latin != null">  
+			AND c.class_latin like '%' || '${class_latin}'|| '%' 
+		</if>
+	</select>
+	
+	<select id="getChildCategories" parameterType="int" resultMap="BacteriumCategoryMap">
+		SELECT * FROM B_SPECIMEN_CLASS_TABLE WHERE PARENT_ID = #{class_id}
+	</select>
+</mapper>
