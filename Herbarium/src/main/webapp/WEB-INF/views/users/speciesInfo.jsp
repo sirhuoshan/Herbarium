@@ -18,7 +18,8 @@
 }
 .site_column{
   width: 940px;
-  margin: 0 auto;
+  margin: 50px auto 0px;
+  
 }
 #page_heading .hgroup {
   float: left;
@@ -37,7 +38,7 @@
 }
 .gallery{
 	overflow: hidden;
-	padding: 20px 20px 10px 20px;
+	padding: 10px 20px 10px 20px;
 	border: 1px solid #cad3db;
 }
 
@@ -84,7 +85,7 @@
 
 .data_div ul{
 	list-style: none;padding: 0px 0px;
-	font-family: Verdana, Arial, Tahoma;
+	font-family: '微软雅黑';
 }
 
 .data_div ul li{
@@ -92,7 +93,7 @@
 }
 
 .data_div .character{
-	height: 100px;
+	height: 110px;
 	overflow: hidden;
 	overflow-y:auto;
 }
@@ -107,23 +108,22 @@
 	overflow: hidden;padding: 0 10px 0 0;margin: 0 -10px 12px -10px;border-bottom: 1px solid #394651;width:410px;
 }
 .summary .header h3{
-	float: left;padding: 0 10px 3px 10px;margin-bottom:0px;font-size: 20px;border-bottom: 3px solid #394651;
+	margin-top:5px;float: left;padding: 0 10px 3px 10px;margin-bottom:0px;font-size: 20px;border-bottom: 3px solid #394651;
+}
+#content{
+	width:1000px;
+	margin:140px auto 0px;
 }
 </style>
 <title>物种列表</title>
 </head>
 <body>
-	<div id="content" style=" margin: 0 auto">
+	<div id="pagewrap" style=" margin: 0 auto">
 	      <header class="content-header">
 	    	<div class="container-main">
 	    	</div>
 		  </header>
-	
-		 <div class="container-main">
-		    <div class="module">
-		    </div>
-		 </div>
-		 <section class="section" style="width:1000px;min-height:1100px;margin:0px auto">
+		 <section class="section" style="min-height:1100px;margin:0px auto">
 			<div class="with_nav" id="page_heading">
 				<div class="site_column">
 					<div class="hgroup">
@@ -138,6 +138,11 @@
 					</ul>
 				</div>
 			</div>
+			
+			 <div class="container-main">
+			    <div class="module">
+			    </div>
+			 </div>
 			
 			<div id="content">
 				<div id="images" style="float: left;width: 580px;">
@@ -177,12 +182,12 @@
 				             <li>&nbsp;&nbsp;<span style="font-weight: bold;">属：</span><span id="genus">${psinfo.genus_val}</span></li>
 				             <li class="character">&nbsp;&nbsp;<span style="font-weight: bold;">形态特征 ：</span><span id="genus">${psinfo.character}</span></li>
 				             <li class="location">&nbsp;&nbsp;<span style="font-weight: bold;">产地分布 ：</span><span id="genus">${psinfo.location}</span></li>
-				             <li style="float: right;">&nbsp;&nbsp;<a href="/pages/628570/data">查看所有信息</a></li>
+				             <li style="float: right;">&nbsp;&nbsp;<a href="<c:url value="/plants/detail/${psinfo.species_id}"/>">查看所有信息</a></li>
 	                        </ul>
 						</div>
 					</div>
 					
-					<div class="summary" >
+					<div class="summary" style="margin-top: 20px;">
 						<div class="header">
 							<h3>系统分类位置</h3>
 						</div>
@@ -195,7 +200,7 @@
 						</div>
 					</div>
 					
-					<div class="summary" >
+					<div class="summary" style="margin-top: 20px;">
 						<div class="header">
 							<h3>相关类群</h3>
 						</div>
@@ -210,7 +215,7 @@
 					</div>
 				</div>
 				<div id="leftarea" style="width: 580px;float: left;">
-					<div class="summary" >
+					<div class="summary" style="margin-top: 20px;">
 						<div class="header" style="width: 580px;">
 							<h3>评论列表</h3>
 						</div>
@@ -227,7 +232,7 @@
 			</div>	
 		</section>
 		
-		<div class="recommend_div" style="height: 200px;width:1000px;margin: 0 auto;">
+		<div class="recommend_div" style="height: 200px;width:1000px;margin: -300px auto 0px;">
 		  	<div class="summary" >
 				<div class="header" style="width: 1000px;">
 					<h3>和您浏览的物种相关的物种</h3>
