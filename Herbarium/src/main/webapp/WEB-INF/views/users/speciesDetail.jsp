@@ -18,7 +18,8 @@
 }
 .site_column{
   width: 940px;
-  margin: 0 auto;
+  margin: 50px auto 0px;
+  
 }
 #page_heading .hgroup {
   float: left;
@@ -109,21 +110,20 @@
 .summary .header h3{
 	float: left;padding: 0 10px 3px 10px;margin-bottom:0px;font-size: 20px;border-bottom: 3px solid #394651;
 }
+#content{
+	width:1000px;
+	margin:140px auto 0px;
+}
 </style>
 <title>物种列表</title>
 </head>
 <body>
-	<div id="content" style=" margin: 0 auto">
+	<div id="pagewrap" style=" margin: 0 auto">
 	      <header class="content-header">
 	    	<div class="container-main">
 	    	</div>
 		  </header>
-	
-		 <div class="container-main">
-		    <div class="module">
-		    </div>
-		 </div>
-		 <section class="section" style="width:1000px;min-height:1100px;margin:0px auto">
+		 <section class="section" style="min-height:1100px;margin:0px auto">
 			<div class="with_nav" id="page_heading">
 				<div class="site_column">
 					<div class="hgroup">
@@ -132,116 +132,49 @@
 						</h1>
 					</div>
 					 <ul class="nav nav-tabs">
-					  <li role="presentation" class="active" style="border: 1px solid #d4dce2;"><a href="<c:url value="/plants/${psinfo.species_id}"/>">概述</a></li>
-					  <li role="presentation" style="border: 1px solid #d4dce2;"><a href="<c:url value="/plants/detail/${psinfo.species_id}"/>">详细信息</a></li>
+					  <li role="presentation" style="border: 1px solid #d4dce2;"><a href="<c:url value="/plants/${psinfo.species_id}"/>">概述</a></li>
+					  <li role="presentation" class="active" style="border: 1px solid #d4dce2;"><a href="<c:url value="/plants/detail/${psinfo.species_id}"/>">详细信息</a></li>
 					  <li role="presentation" style="border: 1px solid #d4dce2;"><a href="<c:url value="/plants/media/${psinfo.species_id}"/>">图片资源</a></li>
 					</ul>
 				</div>
 			</div>
+			<div class="container-main">
+			    <div class="module">
+			    </div>
+			 </div>
 			
 			<div id="content">
-				<div id="images" style="float: left;width: 580px;">
-					<div class="gallery" id="media_summary">
-						<div class="image">
-							<span style="height: 100%;display: inline-block;vertical-align: middle;"></span>
-							<img  id="bigphoto" style="vertical-align:middle;">
-						</div>
-						<ul>
-							<c:forEach varStatus="num" var="media" items="${medias.rows }">
-								<c:choose>
-									<c:when test="${num.index == 0}">
-										<li class="active" id="initphoto" photobig ="${media.media_compress_big_path}"><a href="javascript:void(0)"><img src="/static_img/${media.media_compress_path }"></a></li>
-									</c:when>
-									<c:otherwise>
-										<li photobig ="${media.media_compress_big_path}"><a href="javascript:void(0)"><img src="/static_img/${media.media_compress_path }"></a></li>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</ul>
-						<p style="padding: 5px 0 0 0;font-weight: bold;float: left;">
-						<a href="/pages/1153801/media">查看所有媒体</a>
-						</p>
+				<div class="summary">
+					<div class="header" style="width: 1000px;">
+						<h3>物种详细信息</h3>
 					</div>
-				</div>
-				
-				<div id="rightarea" style="width: 400px;float: right;">
-					<div class="summary">
-						<div class="header">
-							<h3>物种概述</h3>
-						</div>
-						<div class="data_div">
-							<ul>
-				             <li>&nbsp;&nbsp;<span style="font-weight: bold;">拉丁名称：</span><span style="font-style:italic" id="latinName">${psinfo.latin_name}</span></li>
-				             <li>&nbsp;&nbsp;<span style="font-weight: bold;">中文名称：</span><span id="chineseName">${psinfo.chinese_name}</span></li>
-				             <li>&nbsp;&nbsp;<span style="font-weight: bold;">科：</span><span id="family">${psinfo.family}</span></li>
-				             <li>&nbsp;&nbsp;<span style="font-weight: bold;">属：</span><span id="genus">${psinfo.genus_val}</span></li>
-				             <li class="character">&nbsp;&nbsp;<span style="font-weight: bold;">形态特征 ：</span><span id="genus">${psinfo.character}</span></li>
-				             <li class="location">&nbsp;&nbsp;<span style="font-weight: bold;">产地分布 ：</span><span id="genus">${psinfo.location}</span></li>
-				             <li style="float: right;">&nbsp;&nbsp;<a href="/pages/628570/data">查看所有信息</a></li>
-	                        </ul>
-						</div>
-					</div>
-					
-					<div class="summary" >
-						<div class="header">
-							<h3>系统分类位置</h3>
-						</div>
-						<div class="data_div">
-							<ul>
-								<c:forEach varStatus="num" var="pcs" items="${plantsCategories}">
-									<li style="padding-left: ${10*num.index}px"><a href="<c:url value="/plants/species/${pcs.class_id }" />">${pcs.class_name} ${pcs.class_latin}</a></li>
-								</c:forEach>
-							</ul>
-						</div>
-					</div>
-					
-					<div class="summary" >
-						<div class="header">
-							<h3>相关类群</h3>
-						</div>
-						<div class="data_div">
-							<ul>
-								<c:forEach varStatus="num" var="relates" items="${relateSpecies}">
-									<li><a href="<c:url value="/plants/${relates.species_id }" />">${relates.chinese_name} ${relates.latin_name}</a></li>
-								</c:forEach>
-									<li>...</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-				<div id="leftarea" style="width: 580px;float: left;">
-					<div class="summary" >
-						<div class="header" style="width: 580px;">
-							<h3>评论列表</h3>
-						</div>
-						<div class="comment_div">
-							<ul>
-								<c:forEach varStatus="num" var="relates" items="${relateSpecies}">
-									<li><a href="<c:url value="/plants/${relates.species_id }" />">${relates.chinese_name} ${relates.latin_name}</a></li>
-								</c:forEach>
-									<li>...</li>
-							</ul>
+					<div class="data_div">
+						<div style="margin-left: 20px;">
+							<div style="font-size: 14px;font-weight: bold;">
+								${psinfo.chinese_name}
+								<c:if test="${not empty psinfo.other_name}">
+									(${psinfo.other_name})
+								</c:if>
+							</div>
+							<div style="font-size: 14px;font-weight: bold;border-bottom: 1px solid;padding-bottom: 10px;">
+								${psinfo.latin_name}
+							</div>
+							<div>
+								<a href="<c:url value=""/>"> ${psinfo.family}</a>>><a href="<c:url value=""/>">${psinfo.genus_val}</a>
+							</div>
+							
+							<div style="margin-left: 20px;">
+								<p style="padding: 10px 0px;margin: 0 0;text-indent: 2em;">${psinfo.fruit_period}</p>
+								<p style="padding: 10px 0px;margin: 0 0;text-indent: 2em;">${psinfo.growth}</p>
+								<p style="padding: 10px 0px;margin: 0 0;text-indent: 2em;">${psinfo.use}</p>
+								<p style="padding: 10px 0px;margin: 0 0;text-indent: 2em;">${psinfo.character}</p>
+								<p style="padding: 10px 0px;margin: 0 0;text-indent: 2em;">${psinfo.location}</p>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>	
 		</section>
-		
-		<div class="recommend_div" style="height: 200px;width:1000px;margin: 0 auto;">
-		  	<div class="summary" >
-				<div class="header" style="width: 1000px;">
-					<h3>和您浏览的物种相关的物种</h3>
-				</div>
-				<div class="comment_div">
-					<ul>
-						<c:forEach varStatus="num" var="relates" items="${relateSpecies}">
-							<li><a href="<c:url value="/plants/${relates.species_id }" />">${relates.chinese_name} ${relates.latin_name}</a></li>
-						</c:forEach>
-							<li>...</li>
-					</ul>
-				</div>
-			</div>
-	 	</div>	
     </div>
 	<footer id="footer" class="footer">
 		<div class="container">
